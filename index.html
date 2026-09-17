@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#183b30">
+  <meta name="description" content="A tiny island with a little adventure around every corner. Explore Prakhar’s World, meet its residents, and restore the lighthouse.">
+  <title>Prakhar’s World · Pixel Trails</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="world.js" defer></script>
+  <script src="engine.js" defer></script>
+  <script src="game.js" defer></script>
+</head>
+<body>
+  <main id="game" aria-label="Pixel Trails adventure">
+    <canvas id="world" tabindex="0" aria-label="Sunhaven Island. Use WASD or arrow keys to move, E to interact, M for map, and J for journal. Click or tap a destination to walk there.">Your browser needs Canvas support to play this game.</canvas>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">✦</span><div><h1>Prakhar’s world<span class="brand-period">.</span></h1><p>A LITTLE PLACE TO GET LOST</p></div></div>
+      <nav class="top-actions" aria-label="Game controls">
+        <button id="map-button" class="nav-button" title="Open map (M)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/></svg><span>Map</span><kbd>M</kbd></button>
+        <button id="journal-button" class="nav-button" title="Open journal (J)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v17H6a3 3 0 0 1 0-6h13M6 4a2 2 0 0 0-2 2v12M9 8h6M9 11h4"/></svg><span>Journal</span><span id="visited-count" class="count">0/6</span></button>
+        <span class="nav-divider"></span>
+        <button id="sound-button" class="icon-button" aria-label="Turn sound on" aria-pressed="false" title="Sound off"><svg id="sound-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4 6 8H3v8h3l5 4zM16 9l6 6M22 9l-6 6"/></svg></button>
+        <button id="help-button" class="icon-button" aria-label="How to play" title="How to play">?</button>
+      </nav>
+    </header>
+
+    <section class="quest-card panel" aria-labelledby="quest-heading">
+      <div class="eyebrow"><span class="tiny-star">✦</span> THE LIGHTHOUSE QUEST</div>
+      <h2 id="quest-heading">Bring back the light.</h2>
+      <p id="quest-copy">Five lost stars. One little island.</p>
+      <div class="quest-progress"><div id="stars" class="stars" aria-hidden="true"><span>✧</span><span>✧</span><span>✧</span><span>✧</span><span>✧</span></div><span id="star-count">0 / 5</span></div>
+      <div class="progress-track" role="progressbar" aria-label="Stars collected" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"><div id="progress-fill"></div></div>
+    </section>
+
+    <div class="location-pill"><span aria-hidden="true">⌖</span><span id="location-name">Sunhaven Square</span><span class="location-dot">·</span><span class="day-label">DAY 01</span></div>
+
+    <aside id="welcome" class="welcome panel"><button id="dismiss-welcome" class="close-small" aria-label="Dismiss welcome">×</button><span class="eyebrow">HEY, EXPLORER</span><h2>The adventure is yours.</h2><p>Take a walk. Meet the locals.<br>There’s a little magic in every corner.</p><div class="welcome-foot"><span class="key-group"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span><span>or click anywhere to wander</span></div></aside>
+
+    <div id="interact-wrap" hidden><button id="interact-button" class="interact"><kbd>E</kbd><span id="interact-label">Talk</span><span aria-hidden="true">↗</span></button></div>
+
+    <footer class="bottom-bar"><div class="control-hints"><span><kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> Move</span><span><kbd>Shift</kbd> Run</span><span><kbd>E</kbd> Interact</span><span><kbd>Esc</kbd> Pause</span></div><span class="edition">PIXEL TRAILS <span>—</span> VOL. 01</span></footer>
+
+    <button id="minimap-button" class="minimap panel" aria-label="Open island map"><span class="minimap-heading">SUNHAVEN ISLAND <span>↗</span></span><canvas id="minimap" width="220" height="146" aria-hidden="true"></canvas><span class="minimap-footer"><span><i></i> You are here</span><kbd>M</kbd></span></button>
+
+    <div id="touch-controls" class="touch-controls" aria-label="Touch movement controls"><div class="dpad"><button data-direction="up" class="up" aria-label="Move up">↑</button><button data-direction="left" class="left" aria-label="Move left">←</button><button data-direction="down" class="down" aria-label="Move down">↓</button><button data-direction="right" class="right" aria-label="Move right">→</button></div><button id="touch-run" class="touch-run" aria-label="Toggle running" aria-pressed="false">RUN</button></div>
+
+    <div id="toast" class="toast" role="status" hidden></div>
+    <div id="live-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <div id="loading" class="loading"><span class="loading-star">✦</span><strong>A little adventure is loading…</strong><span id="loading-note">Packing the pixel-sized essentials.</span></div>
+    <noscript><div class="loading"><strong>JavaScript is needed to play.</strong><span>Enable JavaScript, then reopen this page.</span></div></noscript>
+  </main>
+
+  <dialog id="dialog" aria-labelledby="dialog-title"><div class="dialog-top"><span id="dialog-eyebrow" class="eyebrow">SUNHAVEN ISLAND</span><button id="close-dialog" class="icon-button" aria-label="Close dialog">×</button></div><div id="dialog-content"></div></dialog>
+</body>
+</html>

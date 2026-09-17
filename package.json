@@ -1,0 +1,11 @@
+{
+  "name": "pixel-trails",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A tiny, playable pixel-art island adventure.",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test tests/engine.test.cjs"
+  },
+  "engines": { "node": ">=18" }
+}
