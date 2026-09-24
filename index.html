@@ -4,18 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#183b30">
-  <meta name="description" content="A tiny island with a little adventure around every corner. Explore Prakhar’s World, meet its residents, and restore the lighthouse.">
-  <title>Prakhar’s World · Pixel Trails</title>
+  <meta name="description" content="Explore three pixel-art worlds, fight their guardians, discover treasure and restore the lighthouse.">
+  <title>Prakhar’s World · Pixel Trails II</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
-  <script src="world.js" defer></script>
+  <script src="collision-data.js" defer></script>
+  <script src="realms.js" defer></script>
   <script src="engine.js" defer></script>
+  <script src="renderer.js" defer></script>
   <script src="game.js" defer></script>
 </head>
 <body>
   <main id="game" aria-label="Pixel Trails adventure">
-    <canvas id="world" tabindex="0" aria-label="Sunhaven Island. Use WASD or arrow keys to move, E to interact, M for map, and J for journal. Click or tap a destination to walk there.">Your browser needs Canvas support to play this game.</canvas>
+    <canvas id="world" tabindex="0" aria-label="Pixel Trails II. WASD or arrows to move. Space or right-click to attack, Q to dash, H to heal, E to interact, M for map, J for journal, Escape to pause. Click a path to walk.">Your browser needs Canvas support to play this game.</canvas>
     <div class="vignette" aria-hidden="true"></div>
+    <div id="damage-flash" aria-hidden="true"></div>
 
     <header class="topbar">
       <div class="brand"><span class="brand-mark" aria-hidden="true">✦</span><div><h1>Prakhar’s world<span class="brand-period">.</span></h1><p>A LITTLE PLACE TO GET LOST</p></div></div>
@@ -25,31 +28,39 @@
         <span class="nav-divider"></span>
         <button id="sound-button" class="icon-button" aria-label="Turn sound on" aria-pressed="false" title="Sound off"><svg id="sound-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4 6 8H3v8h3l5 4zM16 9l6 6M22 9l-6 6"/></svg></button>
         <button id="help-button" class="icon-button" aria-label="How to play" title="How to play">?</button>
+        <button id="pause-button" class="icon-button" aria-label="Pause adventure" title="Pause (Esc)">Ⅱ</button>
       </nav>
     </header>
 
     <section class="quest-card panel" aria-labelledby="quest-heading">
-      <div class="eyebrow"><span class="tiny-star">✦</span> THE LIGHTHOUSE QUEST</div>
-      <h2 id="quest-heading">Bring back the light.</h2>
-      <p id="quest-copy">Five lost stars. One little island.</p>
+      <div class="eyebrow"><span class="tiny-star">✦</span> BEYOND THE ISLAND</div>
+      <h2 id="quest-heading">Three worlds. One beacon.</h2>
+      <p id="quest-copy">Find five stars and two guardian relics.</p>
       <div class="quest-progress"><div id="stars" class="stars" aria-hidden="true"><span>✧</span><span>✧</span><span>✧</span><span>✧</span><span>✧</span></div><span id="star-count">0 / 5</span></div>
       <div class="progress-track" role="progressbar" aria-label="Stars collected" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"><div id="progress-fill"></div></div>
+      <div class="relic-row"><span id="moon-relic">◇ Moonveil</span><span id="ember-relic">◇ Emberfall</span></div>
     </section>
 
-    <div class="location-pill"><span aria-hidden="true">⌖</span><span id="location-name">Sunhaven Square</span><span class="location-dot">·</span><span class="day-label">DAY 01</span></div>
+    <div class="location-pill"><span aria-hidden="true">⌖</span><span id="location-name">Sunhaven Island</span><span class="location-dot">·</span><span id="rune-count" class="day-label">RUNES 0 / 3</span></div>
+    <div id="boss-hud" hidden><span id="boss-name"></span><div><i id="boss-health"></i></div></div>
 
-    <aside id="welcome" class="welcome panel"><button id="dismiss-welcome" class="close-small" aria-label="Dismiss welcome">×</button><span class="eyebrow">HEY, EXPLORER</span><h2>The adventure is yours.</h2><p>Take a walk. Meet the locals.<br>There’s a little magic in every corner.</p><div class="welcome-foot"><span class="key-group"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span><span>or click anywhere to wander</span></div></aside>
+    <aside id="welcome" class="welcome panel"><button id="dismiss-welcome" class="close-small" aria-label="Dismiss welcome">×</button><span class="eyebrow">A NEW CHAPTER</span><h2>Step beyond the island.</h2><p>Meet Pip, try your sword at the dummy, then follow a portal to another world.</p><div class="welcome-foot"><span><kbd>Space</kbd> Attack &nbsp; <kbd>Q</kbd> Dash</span><span>Click a path to walk. Press E to interact.</span></div></aside>
+
+    <section class="player-card panel" aria-label="Player status"><div class="player-card-heading"><span>♥ <span id="health-text">100 / 100</span></span><span id="blade-level">BLADE I</span></div><div class="health-track" role="progressbar" aria-label="Health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="health-fill"></i></div><div class="pack-stats"><span>◈ <strong id="coin-count">0</strong> coins</span><span>♜ <strong id="potion-count">3</strong> potions</span></div></section>
 
     <div id="interact-wrap" hidden><button id="interact-button" class="interact"><kbd>E</kbd><span id="interact-label">Talk</span><span aria-hidden="true">↗</span></button></div>
 
-    <footer class="bottom-bar"><div class="control-hints"><span><kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> Move</span><span><kbd>Shift</kbd> Run</span><span><kbd>E</kbd> Interact</span><span><kbd>Esc</kbd> Pause</span></div><span class="edition">PIXEL TRAILS <span>—</span> VOL. 01</span></footer>
+    <div class="combat-bar" aria-label="Combat controls"><button id="attack-button" title="Attack (Space / right-click)"><span class="action-symbol">⚔</span><span class="action-label">Attack</span><kbd>Space</kbd></button><button id="dash-button" title="Dash (Q)"><span class="action-symbol">➟</span><span class="action-label">Dash</span><kbd>Q</kbd></button><button id="heal-button" title="Drink potion (H)"><span class="action-symbol">♜</span><span class="action-label">Heal</span><kbd>H</kbd></button></div>
+    <footer class="bottom-bar"><div class="control-hints"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</span><span><kbd>Shift</kbd> Run</span><span><kbd>E</kbd> Interact</span><span><kbd>Esc</kbd> Pause</span></div><span class="edition">PIXEL TRAILS <span>—</span> VOL. 02</span></footer>
 
-    <button id="minimap-button" class="minimap panel" aria-label="Open island map"><span class="minimap-heading">SUNHAVEN ISLAND <span>↗</span></span><canvas id="minimap" width="220" height="146" aria-hidden="true"></canvas><span class="minimap-footer"><span><i></i> You are here</span><kbd>M</kbd></span></button>
+    <button id="minimap-button" class="minimap panel" aria-label="Open world map"><span class="minimap-heading"><span id="minimap-name">SUNHAVEN ISLAND</span><span>↗</span></span><canvas id="minimap" width="220" height="146" aria-hidden="true"></canvas><span class="minimap-footer"><span><i></i> You are here</span><kbd>M</kbd></span></button>
 
     <div id="touch-controls" class="touch-controls" aria-label="Touch movement controls"><div class="dpad"><button data-direction="up" class="up" aria-label="Move up">↑</button><button data-direction="left" class="left" aria-label="Move left">←</button><button data-direction="down" class="down" aria-label="Move down">↓</button><button data-direction="right" class="right" aria-label="Move right">→</button></div><button id="touch-run" class="touch-run" aria-label="Toggle running" aria-pressed="false">RUN</button></div>
 
     <div id="toast" class="toast" role="status" hidden></div>
     <div id="live-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <output id="game-state" class="sr-only" aria-live="off"></output>
+    <div id="realm-banner" hidden><span id="realm-subtitle"></span><strong id="realm-title"></strong></div>
     <div id="loading" class="loading"><span class="loading-star">✦</span><strong>A little adventure is loading…</strong><span id="loading-note">Packing the pixel-sized essentials.</span></div>
     <noscript><div class="loading"><strong>JavaScript is needed to play.</strong><span>Enable JavaScript, then reopen this page.</span></div></noscript>
   </main>

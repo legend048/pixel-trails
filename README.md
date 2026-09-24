@@ -1,103 +1,86 @@
-# Pixel Trails — Prakhar’s World
+# Pixel Trails II — Beyond the Island
 
-A complete, playable 2D exploration game inspired by the idea of an interactive pixel-art portfolio. Walk around Sunhaven Island, meet its residents, collect five star fragments, and restore the lighthouse.
+An offline, top-down pixel adventure with three worlds, sword combat, guardian bosses, treasure, rune puzzles, and a lighthouse quest.
 
-## Play immediately
+## Play
 
-1. Extract the entire ZIP.
-2. Open `index.html` in a current desktop browser.
-3. Explore. No install, account, API key, build step, or internet connection is needed.
+1. Extract **the entire ZIP**.
+2. Open `pixel-trails/index.html` in a modern desktop browser.
+3. Meet Pip in Sunhaven, practise at the training dummy, and explore.
 
-Keep the files and `assets` folder together. Opening the HTML from inside a compressed ZIP will not work. If your browser restricts local files, use the optional local server below.
+No installation, account, network connection, API key, build step, or paid service is required. Keep the JavaScript files and `assets` folder beside `index.html`.
 
-## Optional local server
-
-With Node.js 18 or newer installed, open a terminal in the extracted folder:
+If your browser restricts local files, use the optional local server. Install Node.js 18 or newer, open a terminal in this folder, and run:
 
 ```sh
 npm start
 ```
 
-Then visit `http://localhost:4173`. No `npm install` is needed because the project has no package dependencies.
+Then open `http://localhost:4173`. No `npm install` is needed. The server listens only on your computer.
 
-Python also works:
+## What changed in version 2
 
-```sh
-python -m http.server 4173 --bind 127.0.0.1
-```
-
-On Windows, use `py -m http.server 4173 --bind 127.0.0.1` if `python` is unavailable.
+- **Three 3072 × 2048 worlds:** Sunhaven Island, Moonveil Forest, and Emberfall Ruins. Sunhaven keeps its original artwork at twice the previous world dimensions. The forest and ruins have new scenery, paths, clearings and bridges.
+- **Four portal gates:** two outbound gates in Sunhaven and a return gate in each other world. All are available immediately; travel requires interacting with a gate.
+- **Combat:** directional sword swings, a short invulnerable dash, health, healing potions, coins, three sword upgrades, five creature types, and two guardian bosses. Attacks are preceded by visible warning rings.
+- **More things to do:** 10 treasure chests, 16 breakable crates, nine rune stones, a training dummy, nine characters, and seven healing checkpoints. Each world's three runes unlock its sealed cache.
+- **A complete quest:** collect Sunhaven's five stars, defeat both guardians for their relics, then visit Sol beside the lighthouse.
+- **Mapping fixes:** ground collision grids use the same coordinate transform as the artwork. Character-sized pathfinding, bridge/stair geometry, collision substeps, safe portal arrivals, and a clamped camera prevent leaving the map or tunnelling through blocked terrain.
+- **Interface:** world tabs in the map, destination buttons, a quest journal, boss health bars, desktop and touch actions, pause/help panels, optional synthesized sound, and local autosaves.
 
 ## Controls
 
-| Action | Desktop | Touch |
+| Action | Keyboard / mouse | Touch |
 | --- | --- | --- |
 | Move | WASD or arrow keys | Direction pad |
-| Walk to a spot | Click a path | Tap a path |
-| Run | Hold Shift | Tap RUN to toggle |
-| Talk | E near a character, or click the character | Tap the character or talk prompt |
-| Map | M or Map button | Map button or minimap |
-| Journal | J or Journal button | Journal button |
-| Pause | Escape or Space | Open a panel |
-| Close a panel | Escape or close button | Close button |
-| Sound | Speaker button | Speaker button |
+| Walk to a location | Click an open path or a map destination | Tap a path or destination |
+| Run | Hold Shift | Toggle RUN |
+| Attack | Hold Space, or right-click toward a target | Hold the sword button |
+| Dash | Q | Arrow action button |
+| Heal 50 HP | H | Potion button |
+| Talk, open, activate, rest, travel | E or click the nearby prompt | Tap the interaction prompt |
+| Map / journal | M / J | Top toolbar |
+| Pause / close a panel | Escape | Pause / close button |
+| Collision overlay for editing | F3 | — |
 
-The journal also provides keyboard-accessible buttons that walk you to each resident. Characters share clues, and the journal always includes a clue for the next missing star. There is no time limit and no combat.
+Face a creature before swinging. The on-screen sword button aims at a nearby creature if one is in range. A sword swing does 30 damage, plus 10 for each upgrade. Dash has a 1.5-second cooldown. Move out of a guardian's warning ring, then attack while it recovers.
 
-## Included
+## Progress and recovery
 
-- Original 1536 × 1024 island artwork.
-- Animated player and seven characters.
-- Keyboard, click-to-walk and mobile touch controls.
-- Collision-aware A* pathfinding, including the bridge across the river.
-- Five collectible stars and a complete lighthouse ending.
-- Six discoverable locations, conversations, map and journal.
-- Canvas particles, fountain and river sparkles, fire embers, and the restored lighthouse beam.
-- Optional synthesized sound effects; sound starts muted.
-- Device-local progress saving, pause and restart.
-- Responsive interface, keyboard controls, native accessible dialogs, live status messages, and reduced-motion support.
-- Meaningful navigation, collision and saved-progress tests.
+- Campfires restore all health and set your checkpoint. Entering a world also sets a safe arrival checkpoint.
+- If defeated, you return to your checkpoint with full health. Collected stars, relics, coins, upgrades, opened chests, runes and defeated creatures remain recorded.
+- Creature damage resets when leaving a world; defeated creatures stay defeated.
+- Dex sells potions for 15 coins and sword upgrades for 40 coins each. Three upgrades are available.
+- Progress saves locally under `pixel-trails-save-v2` about every three seconds and after important events. Existing version 1 stars and character visits migrate when the old save is available in the same browser origin.
+- Local-file storage behavior varies by browser. Moving the folder, changing browsers, or switching between a file and localhost may use a separate save. If storage is unavailable, the current session still works; the pause screen explains the save status.
+- Restart is under Pause and requires a second confirmation. There are no cloud saves.
+- Open panels and hidden tabs pause the simulation. Muted by default. Reduced-motion preferences disable optional particles and flashing.
 
-## Edit the game
+## Source guide
 
 | File | Purpose |
 | --- | --- |
-| `index.html` | Interface, title and buttons |
-| `styles.css` | Colours, typography and responsive layout |
-| `world.js` | Dialogue, landmarks, star positions, walkable paths, collision regions and the optional GitHub profile link |
-| `engine.js` | Collision detection, A* navigation and saved-game validation |
-| `game.js` | Canvas rendering, character sprites, input, audio, quest and interface behaviour |
-| `assets/island.png` | The original background map |
-| `assets/favicon.svg` | Small star favicon |
-| `scripts/serve.mjs` | Optional Node.js static server |
-| `tests/engine.test.cjs` | Navigation and saved-game tests |
+| `index.html`, `styles.css` | Responsive interface and controls |
+| `realms.js` | World definitions, dialogue, objects and enemy placements |
+| `collision-data.js` | Precomputed ground grids; no runtime image parsing |
+| `engine.js` | Pathfinding, collision, combat, travel, quests and save validation |
+| `renderer.js` | Canvas scenery, pixel characters, props, effects and maps |
+| `game.js` | Input, UI, dialogue, audio and browser save integration |
+| `assets/` | Three map images and the favicon |
+| `tests/engine.test.cjs` | Dependency-free gameplay regression tests |
+| `tools/build-collisions.py` | Optional collision authoring utility |
+| `scripts/serve.mjs` | Optional local development server |
 
-To rename the game, edit the title and heading in `index.html` and `title` in `world.js`. To change profile content, edit `locations` in `world.js`. The workshop currently links to `https://github.com/legend048`; that link only opens the profile and does not connect to GitHub’s API.
+`realms.js` authors positions in the source artwork's 1536 × 1024 coordinates, then applies a single 2× transform. The engine snaps objects onto reachable terrain and keeps solid props away from narrow crossings. Edit names, dialogue, colors and placements there. Edit the brand text in `index.html`.
 
-All game coordinates use the original image’s 1536 × 1024 pixel space. `paths` are walkable corridors, `plazas` are walkable polygons, and `obstacles` block movement. When replacing the map, update these regions and the landmark positions together.
+To regenerate collisions after replacing map artwork, install Python with Pillow, NumPy and SciPy, then run `python tools/build-collisions.py`. Review the geometry overrides for bridges, stairs and buildings, inspect the F3 overlay, and rerun tests. Generated map imagery is scenery; collision geometry is maintained separately and should always be reviewed after art changes. None of these Python packages are required to play.
 
-The character sprites are editable pixel grids near the top of `game.js`. Their colours are in `palette`.
-
-## Test
+## Verification
 
 ```sh
 npm test
 ```
 
-The tests check reachability of every star and character, simulate movement through the quest, verify river/building collisions, and check corrupted and completed saves. They do not constitute browser or device testing.
+The 11 included tests cover routes to all 78 placed elements, representative blocked water/lava/buildings, bridge access, movement and dash boundaries, viewport/camera transforms, attack timing and facing, enemy telegraphs and immunity, single-use rewards, both portal round trips, checkpoints, save migration, and the complete star/relic/lighthouse quest.
 
-## Saving and privacy
-
-Progress is stored under `pixel-trails-save-v1` in browser local storage. It stays on the current device and browser; there is no backend, login, analytics or cloud sync. Local-file storage support varies by browser. If storage is blocked, the game remains playable for the current session. Opening a different local URL may use a separate save.
-
-The game has no remote requests during play. Only the optional workshop profile link opens an external website after a click. Browser zoom, operating-system fonts and device performance can slightly change the interface appearance.
-
-## Art and inspiration
-
-The explorable-world concept was inspired by [Peter Oravec’s portfolio](https://peteroravec.com/). This implementation uses original code, an original generated island illustration, and original editable character sprites. It does not bundle that site’s code, map, character, biography or portfolio content.
-
-The island is a single illustrated background with interactive gameplay layers above it. Buildings have conversations rather than separate interior levels. This is a complete small exploration quest, not a reproduction of the reference site’s entire game engine or world.
-
-## Deployment later
-
-These are ordinary static website files. If you choose to publish later, upload `index.html`, `styles.css`, `world.js`, `engine.js`, `game.js` and `assets/` to a static host. There is no server-side game code or build command. Nothing has been pushed to GitHub or deployed as part of this ZIP delivery.
+During development, an additional direct DOM adapter with a real Canvas implementation checks scene loading, movement and combat input, map tabs, dialogue, journal, help, portal navigation, save restoration and restart. It is an internal smoke check, not a browser layout test. The cloud browser preview could not be completed in this environment, so a full browser/device compatibility sweep has not been performed.
